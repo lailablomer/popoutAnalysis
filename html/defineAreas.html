@@ -1,0 +1,333 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>defineAreas</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-06-22"><meta name="DC.source" content="defineAreas.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">defineAreas</a></li><li><a href="#3">Draw circle by hand</a></li><li><a href="#5">Define circle automatically</a></li><li><a href="#8">Select diameter by hand</a></li><li><a href="#9">Draw circle</a></li><li><a href="#10">Select popout position</a></li><li><a href="#11">Define areas</a></li><li><a href="#12">Devide circles in n areas</a></li></ul></div><h2>defineAreas<a name="1"></a></h2><p>This function shapes the areas that will be used to count the position of the mouse. The areas can be defined automatically by drawing a circle (draw = 0) or the user can draw the areas by hand on the background figure (draw = 1).</p><pre class="codeinput"><span class="keyword">function</span> [areaX, areaY, xOuter, yOuter] = defineAreas(draw, findCircle, n, fig, includedArea)
+</pre><pre class="codeinput"><span class="comment">% Setting parameters</span>
+outerDiameter = 500;
+areaX = zeros([1,n]);
+areaY = zeros([1,n]);
+
+<span class="comment">% making sure background figure is displayed</span>
+open(fig);
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in defineAreas (line 10)
+areaX = zeros([1,n]);
+</pre><h2>Draw circle by hand<a name="3"></a></h2><p>If draw is true the user should draw every area (n in total) by hand on the figure, these areas will be counted when defining the mouse position. The last area should be the popout area.</p><pre class="codeinput"><span class="keyword">if</span> draw
+</pre><pre class="codeinput">    title(<span class="string">'Draw the popout LAST'</span>);
+
+    <span class="keyword">for</span> i = n
+        H = imfreehand;
+        binaryImage = H.createMask();
+        A = bwboundaries(binaryImage);
+        Axy = A{1}; <span class="comment">% Get n by 2 array of x,y coordinates</span>
+        areaX(i) = Axy(:, 2); <span class="comment">% Columns</span>
+        areaY(i) = Axy(:, 1); <span class="comment">% Rows</span>
+        hold <span class="string">on</span>;
+    <span class="keyword">end</span>
+</pre><h2>Define circle automatically<a name="5"></a></h2><p>If the circle should be calculated, first try to automatically detect a circle in the background, otherwise the diameter has to be set by hand.</p><pre class="codeinput"><span class="keyword">else</span>
+</pre><pre class="codeinput">    noCircle = 0;
+
+    <span class="comment">% automatically find circle</span>
+    <span class="keyword">if</span> findCircle
+        [center, radius] = imfindcircles(backgroundImage, [(outerDiameter/2) ((outerDiameter/2)+100)], <span class="string">'Sensitivity'</span>, 0.9);
+
+        <span class="comment">% if no circle is found, alert the user and ask to define the</span>
+        <span class="comment">% diameter.</span>
+        <span class="keyword">if</span> isempty(center)
+            fprintf(<span class="string">'Could not find outer circle, re-select diameter!\n'</span>);
+            noCircle = 1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><h2>Select diameter by hand<a name="8"></a></h2><p>If no circle can be found, the user has to set the diameter by hand. From this line the centre and radius will be defined.</p><pre class="codeinput">    <span class="keyword">if</span> noCircle
+        title(<span class="string">'SELECT DIAMETER!'</span>);
+        line1 = imdistline(gca);
+        pause;
+
+        <span class="comment">% get the radius</span>
+        api1 = iptgetapi(line1);
+        radius = round(api1.getDistance() / 2);
+
+        <span class="comment">% define middle of the circle</span>
+        pos = api1.getPosition;
+        center = [mean(pos(:,1)) mean(pos(:,2))];
+    <span class="keyword">end</span>
+
+    fprintf(<span class="string">'Circle found!'</span>);
+</pre><h2>Draw circle<a name="9"></a></h2><p>define middle and radia of the outer and inner circle</p><pre class="codeinput">    xCenter = center(1);
+    yCenter = center(2);
+    radiusOuter = radius;
+    radiusInner = radiusOuter - (includedArea / 2);
+</pre><h2>Select popout position<a name="10"></a></h2><p>define position of popout by clicking on the figure</p><pre class="codeinput">    title(<span class="string">'Select popout position'</span>);
+    [Popx, Popy] = getpts();
+    hold <span class="string">on</span>;
+    fprintf(<span class="string">'Popout position is defined\n'</span>);
+</pre><h2>Define areas<a name="11"></a></h2><pre class="codeinput">    <span class="comment">% Outer circle dynamics</span>
+    theta = 0 : 0.03 : 2*pi;
+    xOuter = radiusOuter * cos(theta) + xCenter;
+    yOuter = radiusOuter * sin(theta) + yCenter;
+    lengthOuter = length(xOuter);
+
+    <span class="comment">% Inner circle dynamics</span>
+    <span class="keyword">if</span> includedArea == 0
+        xInner(1,1:lengthOuter) = xCenter;
+        yInner(1,1:lengthOuter) = yCenter;
+    <span class="keyword">else</span>
+        xInner = radiusInner * cos(theta) + xCenter;
+        yInner = radiusInner * sin(theta) + yCenter;
+    <span class="keyword">end</span>
+    lengthInner = length(xInner);
+
+    <span class="comment">% find popout position on circle</span>
+    xDif = xOuter - Popx;
+    yDif = yOuter - Popy;
+    [~, ind] = min(abs(xDif - yDif));
+
+    <span class="comment">% If the positions are too far apart</span>
+    <span class="keyword">if</span> ~(yOuter(ind) &gt; Popy - 100) &amp;&amp; (yOuter(ind) &lt; Popy + 100)
+        ind = mod(ind + (lengthOuter / 2), lengthOuter);
+    <span class="keyword">end</span>
+
+    <span class="comment">% Re-define start and end to be at the popout</span>
+    ind = mod(round(ind + (lengthOuter/(n*2))), lengthOuter);
+    xOuter = [xOuter(ind:end), xOuter(1:ind-1)];
+    yOuter = [yOuter(ind:end), yOuter(1:ind-1)];
+    xInner = [xInner(ind:end), xInner(1:ind-1)];
+    yInner = [yInner(ind:end), yInner(1:ind-1)];
+
+    <span class="comment">% Plot circles on the figure</span>
+    plot(xOuter, yOuter);
+    hold <span class="string">on</span>;
+    plot(xInner, yInner);
+    hold <span class="string">on</span>;
+</pre><h2>Devide circles in n areas<a name="12"></a></h2><pre class="codeinput">    <span class="comment">% Reshape values in n cells</span>
+    xOuter = num2cell(reshape(round(xOuter), lengthOuter/n, n),1);
+    yOuter = num2cell(reshape(round(yOuter), lengthOuter/n, n),1);
+
+    xInner = num2cell(reshape(round(xInner), lengthInner/n, n),1);
+    yInner = num2cell(reshape(round(yInner), lengthInner/n, n),1);
+
+    <span class="comment">% Define x and y values for n parts of the ring</span>
+    <span class="keyword">for</span> i = n
+        areaX(i) = [xOuter{i}; flip(xInner{i}); xOuter{i}(1)];
+        areaY(i) = [yOuter{i}; flip(yInner{i}); yOuter{i}(1)];
+    <span class="keyword">end</span>
+
+    <span class="comment">% plot popout-position on figure</span>
+    plot(areaX(10),areaY(10));
+    hold <span class="string">on</span>;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% defineAreas
+% This function shapes the areas that will be used to count the position of
+% the mouse. The areas can be defined automatically by drawing a circle
+% (draw = 0) or the user can draw the areas by hand on the background
+% figure (draw = 1).
+
+function [areaX, areaY, xOuter, yOuter] = defineAreas(draw, findCircle, n, fig, includedArea)
+% Setting parameters
+outerDiameter = 500;
+areaX = zeros([1,n]);
+areaY = zeros([1,n]);
+
+% making sure background figure is displayed
+open(fig);
+
+%% Draw circle by hand
+% If draw is true the user should draw every area (n in total) by hand
+% on the figure, these areas will be counted when defining the mouse
+% position. The last area should be the popout area.
+if draw
+    title('Draw the popout LAST');
+        
+    for i = n        
+        H = imfreehand;
+        binaryImage = H.createMask();
+        A = bwboundaries(binaryImage);
+        Axy = A{1}; % Get n by 2 array of x,y coordinates
+        areaX(i) = Axy(:, 2); % Columns
+        areaY(i) = Axy(:, 1); % Rows
+        hold on;
+    end
+
+%% Define circle automatically
+% If the circle should be calculated, first try to automatically detect a
+% circle in the background, otherwise the diameter has to be set by hand.
+else 
+    noCircle = 0;
+    
+    % automatically find circle
+    if findCircle
+        [center, radius] = imfindcircles(backgroundImage, [(outerDiameter/2) ((outerDiameter/2)+100)], 'Sensitivity', 0.9);
+        
+        % if no circle is found, alert the user and ask to define the
+        % diameter. 
+        if isempty(center)
+            fprintf('Could not find outer circle, re-select diameter!\n'); 
+            noCircle = 1;
+        end
+    end
+  
+    %% Select diameter by hand
+    % If no circle can be found, the user has to set the diameter by hand. From this line the centre and radius will be defined.
+    if noCircle        
+        title('SELECT DIAMETER!');
+        line1 = imdistline(gca);
+        pause;
+        
+        % get the radius
+        api1 = iptgetapi(line1);
+        radius = round(api1.getDistance() / 2);
+        
+        % define middle of the circle
+        pos = api1.getPosition;
+        center = [mean(pos(:,1)) mean(pos(:,2))];
+    end
+    
+    fprintf('Circle found!');
+    
+    %% Draw circle
+    % define middle and radia of the outer and inner circle
+    xCenter = center(1);
+    yCenter = center(2);
+    radiusOuter = radius;
+    radiusInner = radiusOuter - (includedArea / 2);
+    
+    %% Select popout position
+    % define position of popout by clicking on the figure
+    title('Select popout position');
+    [Popx, Popy] = getpts();
+    hold on;
+    fprintf('Popout position is defined\n');
+    
+    %% Define areas
+    
+    % Outer circle dynamics
+    theta = 0 : 0.03 : 2*pi;
+    xOuter = radiusOuter * cos(theta) + xCenter;
+    yOuter = radiusOuter * sin(theta) + yCenter;
+    lengthOuter = length(xOuter);
+
+    % Inner circle dynamics
+    if includedArea == 0
+        xInner(1,1:lengthOuter) = xCenter;
+        yInner(1,1:lengthOuter) = yCenter;
+    else
+        xInner = radiusInner * cos(theta) + xCenter;
+        yInner = radiusInner * sin(theta) + yCenter;
+    end
+    lengthInner = length(xInner);
+    
+    % find popout position on circle 
+    xDif = xOuter - Popx;
+    yDif = yOuter - Popy;
+    [~, ind] = min(abs(xDif - yDif));
+    
+    % If the positions are too far apart
+    if ~(yOuter(ind) > Popy - 100) && (yOuter(ind) < Popy + 100)
+        ind = mod(ind + (lengthOuter / 2), lengthOuter);
+    end
+    
+    % Re-define start and end to be at the popout 
+    ind = mod(round(ind + (lengthOuter/(n*2))), lengthOuter);
+    xOuter = [xOuter(ind:end), xOuter(1:ind-1)];
+    yOuter = [yOuter(ind:end), yOuter(1:ind-1)];
+    xInner = [xInner(ind:end), xInner(1:ind-1)];
+    yInner = [yInner(ind:end), yInner(1:ind-1)];
+    
+    % Plot circles on the figure
+    plot(xOuter, yOuter);
+    hold on;
+    plot(xInner, yInner);
+    hold on;
+    
+    %% Devide circles in n areas
+    
+    % Reshape values in n cells
+    xOuter = num2cell(reshape(round(xOuter), lengthOuter/n, n),1);
+    yOuter = num2cell(reshape(round(yOuter), lengthOuter/n, n),1);
+
+    xInner = num2cell(reshape(round(xInner), lengthInner/n, n),1);
+    yInner = num2cell(reshape(round(yInner), lengthInner/n, n),1);
+
+    % Define x and y values for n parts of the ring
+    for i = n
+        areaX(i) = [xOuter{i}; flip(xInner{i}); xOuter{i}(1)];
+        areaY(i) = [yOuter{i}; flip(yInner{i}); yOuter{i}(1)];
+    end
+
+    % plot popout-position on figure
+    plot(areaX(10),areaY(10));
+    hold on;
+end
+            
+end
+##### SOURCE END #####
+--></body></html>

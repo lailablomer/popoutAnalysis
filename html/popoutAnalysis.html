@@ -1,0 +1,374 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>popoutAnalysis</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-06-22"><meta name="DC.source" content="popoutAnalysis.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">mousePosition</a></li><li><a href="#3">variables</a></li><li><a href="#4">Retrieve file</a></li><li><a href="#5">background</a></li><li><a href="#6">define boundaries around stimuli</a></li><li><a href="#8">actual analysis part</a></li><li><a href="#11">find mouse position</a></li><li><a href="#12">track frames spend at stimulus</a></li><li><a href="#14">collect data</a></li></ul></div><h2>mousePosition<a name="1"></a></h2><p>Takes a video file and returns the position of the mouse for every frame. also it scores the time (in number of frames) the mouse spents at each of the 10 stimuli.</p><pre class="codeinput"><span class="keyword">function</span> [positions, scoring, popout, rest, files] = popoutAnalysis(filename, startframe, endframe, draw, findCircle, includedArea)
+</pre><p>filename = file to be analysed startframe, endframe = both integers draw = true or false: specifies whether you want to draw the ROI's yourself. excludedArea = integer, specifies the part of a circle excluded from analysis.   If 0, the whole outer circle is analysed.</p><pre class="codeinput"><span class="comment">% tic;</span>
+
+<span class="comment">% clc;    % Clear the command window.</span>
+close <span class="string">all</span>;  <span class="comment">% Close all figures (except those of imtool.)</span>
+imtool <span class="string">close</span> <span class="string">all</span>;  <span class="comment">% Close all imtool figures.</span>
+<span class="comment">% clear;  % Erase all existing variables.</span>
+workspace;  <span class="comment">% Make sure the workspace panel is showing.</span>
+</pre><h2>variables<a name="3"></a></h2><pre class="codeinput">blackThreshold = 0.20; <span class="comment">% Treshold for amount of blackness to be treated as mouse %was 0.30</span>
+n = 10; <span class="comment">% amount of stimuli</span>
+</pre><h2>Retrieve file<a name="4"></a></h2><pre class="codeinput">folder = fileparts(which(filename));
+movieFullFileName = fullfile(folder, filename);
+<span class="comment">% Check to see that it exists.</span>
+<span class="keyword">if</span> ~exist(movieFullFileName, <span class="string">'file'</span>)
+	sprintf(<span class="string">'File not found:\n%s\nRedefine filename and try again!'</span>, movieFullFileName);
+	<span class="keyword">return</span>;
+<span class="keyword">end</span>
+
+numberOfFramesWritten = 0;
+
+<span class="comment">% try</span>
+</pre><h2>background<a name="5"></a></h2><pre class="codeinput">    videoObject = VideoReader(movieFullFileName);
+
+    <span class="comment">% make background</span>
+    [double_bg, numberOfFrames, meanMaxRGB, fig] = makeBackground(startframe, endframe, videoObject);
+    backgroundImage = uint8(double_bg);
+</pre><h2>define boundaries around stimuli<a name="6"></a></h2><p>draw boundary on first frame</p><pre class="codeinput">    [areaX, areaY, xOuter, yOuter] = defineAreas(draw, findCircle, n, fig, includedArea, backgroundImage);
+</pre><pre class="codeinput">    oldpos = 0;
+    positions = zeros((numberOfFrames-startframe) + 1, 6);
+    mouseArea = zeros(1,10);
+
+    count = 1;
+</pre><h2>actual analysis part<a name="8"></a></h2><pre class="codeinput">    <span class="keyword">for</span> frame = startframe : numberOfFrames
+</pre><pre class="codeinput">        <span class="comment">% For every frame, the background is substracted. Then, the</span>
+        <span class="comment">% resulting image is tresholded to have the remainig shape which is assumed</span>
+        <span class="comment">% to be the mouse. From this, the position of the mouse is calculated.</span>
+</pre><pre class="codeinput">        vidFrames = read(videoObject, frame);
+        Frame = vidFrames(:,:,:,1);
+
+        <span class="comment">% mouse head position is towards stimulus</span>
+        inArea = 0;
+        area = 0;
+        xBorderArea = [];
+
+        <span class="comment">% Subtraction and tresholding of current frame</span>
+        B = imcomplement(Frame);
+        B = double(B) - double_bg;
+
+<span class="comment">%         if mod(frame, 100) == 0</span>
+<span class="comment">%             figure</span>
+<span class="comment">%             imshow(B);</span>
+<span class="comment">%         end</span>
+</pre><h2>find mouse position<a name="11"></a></h2><p>If the maximum RGB values are smaller than this value it is better to have a normalized treshold since the video is pretty blurry.</p><pre class="codeinput">        <span class="keyword">if</span> meanMaxRGB &gt; 90
+            mouse = B(:,:,1) &gt; meanMaxRGB* blackThreshold;
+        <span class="keyword">else</span>
+            mouse = B(:,:,1) &gt; max(B(:))* blackThreshold;
+        <span class="keyword">end</span>
+
+<span class="comment">%         if mod(frame, 100) == 0</span>
+<span class="comment">%             figure</span>
+<span class="comment">%             imshow(mouse);</span>
+            filename = strcat(<span class="string">'frame'</span>, num2str(frame));
+            files{count} = struct(<span class="string">'image'</span>, mouse, <span class="string">'frame'</span>, filename);
+            count = count+1;
+<span class="comment">%             imsave(mouse);</span>
+<span class="comment">%         end</span>
+
+        <span class="comment">% get mouse with tail position</span>
+        [xtail, ytail, tail, finalpos] = mousePosition(oldpos, mouse, frame);
+        oldpos = finalpos;
+
+<span class="comment">%         if mod(frame, 250) == 0</span>
+<span class="comment">%            figure;</span>
+<span class="comment">%            imshow(mouse);</span>
+<span class="comment">%            hold on;</span>
+<span class="comment">%            if tail</span>
+<span class="comment">%                plot(xtail,ytail,'*r');</span>
+<span class="comment">%                hold on;</span>
+<span class="comment">%            end</span>
+<span class="comment">%</span>
+<span class="comment">%            plot(finalpos(1), finalpos(2),'*g');</span>
+<span class="comment">%            hold on;</span>
+<span class="comment">%         end</span>
+</pre><h2>track frames spend at stimulus<a name="12"></a></h2><p>check if mouse is in a specified area</p><pre class="codeinput">        <span class="keyword">for</span> i = n
+            <span class="keyword">if</span> inpolygon(finalpos(1), finalpos(2), areaX(i), areaY(i)
+                mouseArea(1,i) = mouseArea(1,i) + 1;
+                xBorderArea = xOuter{i};
+                yBorderArea = yOuter{i};
+                area = i;
+                <span class="keyword">break</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+
+        <span class="comment">% check if mouse body position is in between tail and border</span>
+        <span class="keyword">if</span> tail &amp;&amp; ~isempty(xBorderArea)
+            xTemp = horzcat(xtail ,xBorderArea', xtail);
+            yTemp = horzcat(ytail, yBorderArea', ytail);
+            inArea = inpolygon(finalpos(1), finalpos(2), xTemp, yTemp);
+        <span class="keyword">end</span>
+
+        <span class="comment">% save position</span>
+        positions(frame-startframe+1,:) = [finalpos, inArea, area, xtail, ytail];
+
+        <span class="comment">% keep track of processed frames</span>
+        <span class="keyword">if</span> mod(frame+1, 100) == 0
+            fprintf(<span class="string">'Processed frame %4d of %d\n'</span>, frame-startframe+1, numberOfFrames-startframe);
+        <span class="keyword">end</span>
+
+		numberOfFramesWritten = numberOfFramesWritten + 1;
+
+<span class="comment">%         if numberOfFramesWritten == 50</span>
+<span class="comment">%             return</span>
+<span class="comment">%         end</span>
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+</pre><h2>collect data<a name="14"></a></h2><pre class="codeinput">    scoring = struct(<span class="string">'popout'</span>, mouseArea(1,10), <span class="string">'area1'</span>, mouseArea(1,1), <span class="string">'area2'</span>, mouseArea(1,2), <span class="string">'area3'</span>, mouseArea(1,3), <span class="string">'area4'</span>, mouseArea(1,4),<span class="string">'area5'</span>, mouseArea(1,5), <span class="string">'area6'</span>, mouseArea(1,6), <span class="string">'area7'</span>, mouseArea(1,7), <span class="string">'area8'</span>, mouseArea(1,8), <span class="string">'area9'</span>, mouseArea(1,9));
+    popout = mouseArea(1,10);
+    rest = sum(mouseArea(1,1:9)) / 9;
+
+	<span class="comment">% alert user when done</span>
+	sprintf(<span class="string">'Done!  It processed %d frames of\n"%s\n"'</span>, numberOfFramesWritten, movieFullFileName);
+	fprintf(<span class="string">'Circles and popout area are drawn over background in figure 1\n'</span>);
+
+<span class="comment">% catch ME</span>
+<span class="comment">% 	% Some error happened if you get here.</span>
+<span class="comment">% 	strErrorMessage = sprintf('Error extracting movie frames from:\n\n%s\n\nError: %s\n\n)', movieFullFileName, ME.message);</span>
+<span class="comment">% 	uiwait(msgbox(strErrorMessage));</span>
+<span class="comment">% end</span>
+
+<span class="comment">% toc;</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeoutput error">Error using dbstatus
+Error: File: C:\Users\Gebruiker\Dropbox\MATLAB\PopoutAnalysis\popoutAnalysis.m Line: 118 Column: 70
+Expression or statement is incorrect--possibly unbalanced (, {, or [.
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% mousePosition 
+% Takes a video file and returns the position of the mouse for every frame.
+% also it scores the time (in number of frames) the mouse spents at each of
+% the 10 stimuli.
+
+function [positions, scoring, popout, rest, files] = popoutAnalysis(filename, startframe, endframe, draw, findCircle, includedArea)
+%% 
+% filename = file to be analysed
+% startframe, endframe = both integers
+% draw = true or false: specifies whether you want to draw the ROI's yourself. 
+% excludedArea = integer, specifies the part of a circle excluded from analysis. 
+%   If 0, the whole outer circle is analysed.
+
+% tic;
+
+% clc;    % Clear the command window.
+close all;  % Close all figures (except those of imtool.)
+imtool close all;  % Close all imtool figures.
+% clear;  % Erase all existing variables.
+workspace;  % Make sure the workspace panel is showing.
+
+%% variables 
+blackThreshold = 0.20; % Treshold for amount of blackness to be treated as mouse %was 0.30
+n = 10; % amount of stimuli
+
+%% Retrieve file
+folder = fileparts(which(filename));
+movieFullFileName = fullfile(folder, filename);
+% Check to see that it exists.
+if ~exist(movieFullFileName, 'file')
+	sprintf('File not found:\n%s\nRedefine filename and try again!', movieFullFileName);
+	return;
+end
+
+numberOfFramesWritten = 0;
+
+% try
+    %% background
+    videoObject = VideoReader(movieFullFileName);
+	
+    % make background
+    [double_bg, numberOfFrames, meanMaxRGB, fig] = makeBackground(startframe, endframe, videoObject);
+    backgroundImage = uint8(double_bg);
+    
+    %% define boundaries around stimuli
+    % draw boundary on first frame
+    [areaX, areaY, xOuter, yOuter] = defineAreas(draw, findCircle, n, fig, includedArea, backgroundImage);
+    
+%% 
+    oldpos = 0;
+    positions = zeros((numberOfFrames-startframe) + 1, 6);
+    mouseArea = zeros(1,10);
+    
+    count = 1;
+    %% actual analysis part
+    for frame = startframe : numberOfFrames		
+        % For every frame, the background is substracted. Then, the
+        % resulting image is tresholded to have the remainig shape which is assumed
+        % to be the mouse. From this, the position of the mouse is calculated.
+    %% 
+        vidFrames = read(videoObject, frame);
+        Frame = vidFrames(:,:,:,1);
+        
+        % mouse head position is towards stimulus
+        inArea = 0;
+        area = 0;
+        xBorderArea = [];
+        
+        % Subtraction and tresholding of current frame
+        B = imcomplement(Frame);
+        B = double(B) - double_bg;
+        
+%         if mod(frame, 100) == 0
+%             figure
+%             imshow(B);
+%         end
+        
+        
+        %% find mouse position
+        % If the maximum RGB values are smaller than this value it is better to
+        % have a normalized treshold since the video is pretty blurry.
+        
+        if meanMaxRGB > 90
+            mouse = B(:,:,1) > meanMaxRGB* blackThreshold;
+        else
+            mouse = B(:,:,1) > max(B(:))* blackThreshold;
+        end
+        
+%         if mod(frame, 100) == 0
+%             figure
+%             imshow(mouse);
+            filename = strcat('frame', num2str(frame));
+            files{count} = struct('image', mouse, 'frame', filename);
+            count = count+1;
+%             imsave(mouse);
+%         end
+        
+        % get mouse with tail position
+        [xtail, ytail, tail, finalpos] = mousePosition(oldpos, mouse, frame);
+        oldpos = finalpos;
+        
+%         if mod(frame, 250) == 0
+%            figure;
+%            imshow(mouse);
+%            hold on;
+%            if tail
+%                plot(xtail,ytail,'*r');
+%                hold on;
+%            end
+%                
+%            plot(finalpos(1), finalpos(2),'*g');
+%            hold on;
+%         end
+        
+        %% track frames spend at stimulus
+        % check if mouse is in a specified area
+        for i = n
+            if inpolygon(finalpos(1), finalpos(2), areaX(i), areaY(i)
+                mouseArea(1,i) = mouseArea(1,i) + 1;
+                xBorderArea = xOuter{i};
+                yBorderArea = yOuter{i};
+                area = i;
+                break
+            end
+        end
+        
+        
+        % check if mouse body position is in between tail and border
+        if tail && ~isempty(xBorderArea)
+            xTemp = horzcat(xtail ,xBorderArea', xtail);
+            yTemp = horzcat(ytail, yBorderArea', ytail);
+            inArea = inpolygon(finalpos(1), finalpos(2), xTemp, yTemp);
+        end
+        
+        % save position
+        positions(frame-startframe+1,:) = [finalpos, inArea, area, xtail, ytail];
+        
+        % keep track of processed frames
+        if mod(frame+1, 100) == 0
+            fprintf('Processed frame %4d of %d\n', frame-startframe+1, numberOfFrames-startframe);
+        end
+        
+		numberOfFramesWritten = numberOfFramesWritten + 1;
+        
+%         if numberOfFramesWritten == 50
+%             return
+%         end
+    end
+    
+%% collect data
+    scoring = struct('popout', mouseArea(1,10), 'area1', mouseArea(1,1), 'area2', mouseArea(1,2), 'area3', mouseArea(1,3), 'area4', mouseArea(1,4),'area5', mouseArea(1,5), 'area6', mouseArea(1,6), 'area7', mouseArea(1,7), 'area8', mouseArea(1,8), 'area9', mouseArea(1,9));
+    popout = mouseArea(1,10);
+    rest = sum(mouseArea(1,1:9)) / 9;
+	
+	% alert user when done
+	sprintf('Done!  It processed %d frames of\n"%s\n"', numberOfFramesWritten, movieFullFileName);
+	fprintf('Circles and popout area are drawn over background in figure 1\n');
+    
+% catch ME
+% 	% Some error happened if you get here.
+% 	strErrorMessage = sprintf('Error extracting movie frames from:\n\n%s\n\nError: %s\n\n)', movieFullFileName, ME.message);
+% 	uiwait(msgbox(strErrorMessage));
+% end
+
+% toc;
+
+end
+
+##### SOURCE END #####
+--></body></html>
