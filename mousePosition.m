@@ -1,5 +1,9 @@
-function [xtail, ytail, tail, finalpos] = mousePosition(oldpos, mouse, frame)
+%% mousePosition
+% This function takes the binary image with the mouse and computes the
+% position of the mouse, and, if possible the tail position. 
 
+function [xtail, ytail, tail, finalpos] = mousePosition(oldpos, mouse, frame)
+% Set variables
 minAreaSize = 200; % Minimal area size for region that is tracked as mouse
 beginFound = 0;
 tailNotFound = 0;
@@ -8,9 +12,8 @@ tailToMiddle = 70;
 
 %% Find mouse position
 % If the position is not found, either the old position is taken as the
-% current one if mouse is not near the nest in previous frame. If mouse
-% was near nest then he is probably in nest and the new posiiton is the
-% nestcenter
+% current one. Worste case scenario there is no shape, and the position is
+% set to be 0.
 pos = regionprops(mouse, 'Centroid', 'Area');
 if isempty(pos)
     if oldpos ~= 0
@@ -97,7 +100,7 @@ if ~tailNotFound
     firstInd = ind;
     left = ind;
     right = ind;
-    halfway = mod(ind + (row / 2), row);
+    halfway = round(mod(ind + (row / 2), row));
 end
 
 %% Beginning of tail
@@ -125,7 +128,9 @@ else
     tail = 1;
     
 %% Separate tail and body
-% Check if the end of the mouseBoundary is passed or not.
+% Check if the end of the mouseBoundary is passed or not. Based on this,
+% devide the mouse in the binary image in the body and the tail
+
     passEnd = 0;
     if ind > firstInd
         dif = ind - firstInd;
@@ -164,9 +169,10 @@ else
     
     % new mouse binary mask
     tailBinary = poly2mask(fulltail(:,2), fulltail(:,1), M, N);
-%     mouseNew = logical(mouseBinary - tailBinary);
     mouseNew = poly2mask(rest(:,2), rest(:,1), M, N);
     
+    % if there are multiple shapes in the binary image, make a new image
+    % with only the largest shape 
     temp = bwconncomp(mouseNew);
     if temp.NumObjects > 1
         numPixels = cellfun(@numel,temp.PixelIdxList);
@@ -176,53 +182,11 @@ else
         mouseNew = logical(temp2);
     end
     
-    if mod(frame, 260) == 0
-        
-        figure;
-        imshow(mouseNew);
-        hold on;
-        plot(xtail, ytail, '*m');
-        hold on;
-
-    end
-
+    % only if the body is bigger than the tail, take the new mouse position
+    % from the centre of the body. 
     if (sum(tailBinary(:)) < sum(mouseNew(:)))
-%         tailBinary = poly2mask(rest(:,2), rest(:,1), M, N);
-%         mouseNew = logical(mouseBinary - tailBinary);
-%         mouseNew = bwmorph(mouseNew, 'bridge', Inf);
         posNew = regionprops(mouseNew, 'Centroid');
         finalpos = posNew.Centroid;
-        
-%         if mod(frame, 140) == 0;
-%             figure;
-%             imshow(mouseNew);
-%             hold on;
-%             plot(finalpos(1), finalpos(2), '*r');
-%             hold on;
-%             plot(xtail, ytail, '*m');
-%         end
-        
     end
-    
-%     finalpos = [xmouse ymouse];
-    
-%     plot(xmouse, ymouse, '*g');
-%     hold on;
-%     plot(fulltail(:,2), fulltail(:,1), 'r');
-%     hold on;
-%     plot(rest(:,2), rest(:,1), 'b');
-%     hold on;
-%     plot(xtail, ytail,'*r');
-%     hold on;
 end
-% 
-plot(finalpos(1), finalpos(2),'*g');
-hold on;
-% 
-
-% if ~isempty(tailBinary)
-   
-    
-
 end
-
