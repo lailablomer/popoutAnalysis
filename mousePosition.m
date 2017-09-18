@@ -73,18 +73,26 @@ D = bwdistgeodesic(mouseBinary, floor(finalpos(1)), floor(finalpos(2)), 'quasi-e
 posTails = D(:);
 
 % Define distance between tail and body and check length
-dist = tailToMiddle - 1;
-while dist < tailToMiddle
-    [num,indD] = max(posTails);
-    if isnan(num) || (num == 0)
-        tailNotFound = 1;
-        break
-    end
-    [ytail,xtail] = ind2sub(size(D),indD);
-    posTails(indD) = 0;
-    dist = pdist([finalpos; [xtail, ytail]]);    
-end
 
+% % dist = tailToMiddle - 1;
+% % while dist < tailToMiddle
+% %     [num,indD] = max(posTails);
+% %     if isnan(num) || (num == 0)
+% %         tailNotFound = 1;
+% %         break
+% %     end
+% %     [ytail,xtail] = ind2sub(size(D),indD);
+% %     posTails(indD) = 0;
+% %     dist = pdist([finalpos; [xtail, ytail]]);    
+% % end
+
+[~,indD] = max(posTails);
+[ytail,xtail] = ind2sub(size(D),indD);
+dist = pdist([finalpos; [xtail, ytail]]); 
+if dist < tailToMiddle
+    tailNotFound = 1;
+end
+    
 % Compute distance between found tail and every point of mouseBoundary get the coordinate with the minimum distance
 if ~tailNotFound
     np = length(mouseBoundary(:,1));
