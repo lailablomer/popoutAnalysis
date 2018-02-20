@@ -1,9 +1,17 @@
-%% mousePosition 
+%% popoutAnalysis
 % Takes a video file and returns the position of the mouse for every frame.
-% also it scores the time (in number of frames) the mouse spents at each of
-% the 10 stimuli.
+% Also it scores the time (in number of frames) the mouse spents at each of
+% the 10 stimuli. If the tail of the mouse is found, the orientation is
+% calculated for that position. All output is summarized in positions =
+% [xposition, yposition, Area(0 if the mouse is no area),
+% TailFound(logical), xtailposition, ytailposition]. 
+%
+% Code is available at https://github.com/lailablomer/popoutAnalysis 
 
-function [positions, scoring, popout, rest] = popoutAnalysis(filename, startframe, endframe, draw, findCircle, includedArea)
+function [positions, scoring, popout, rest] = popoutAnalysis(filename, startframe, endframe, draw, findCircle, includedArea, stimuli)
+
+% stimuli = the amound of stimuli in the arena (normally 10, including the popout)
+
 clc;    
 close all;
 workspace;
@@ -33,11 +41,11 @@ videoObject = VideoReader(movieFullFileName);
 % Create n areas to score the video for. This can either be done by hand
 % (draw = 1), the function can find a circle itself (findCircle = 1), or
 % the user can define the circle diameter. 
-[areaX, areaY, xOuter, yOuter] = defineAreas(draw, findCircle, n, includedArea);
+[areaX, areaY, xOuter, yOuter] = defineAreas(draw, findCircle, stimuli, includedArea);
 
 %% variables 
 blackThreshold = 0.20; % Treshold for amount of blackness to be treated as mouse
-n = 10; % amount of stimuli
+n = stimuli; % amount of stimuli
 
 oldpos = 0;
 positions = zeros((numberOfFrames-startframe) + 1, 6);
